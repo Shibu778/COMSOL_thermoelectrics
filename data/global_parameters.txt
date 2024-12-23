@@ -1,0 +1,6 @@
+I0	0.0[A]	0 A	Current at the Hot plate
+room_T	298.15[K]	298.15 K	Room Temperature
+LT	323.15[K]	323.15 K	Lowest Temperature
+delT	50[K]	50 K	Temperature step
+HT	774[K]	774 K	Highest Temperature
+THP	500[K]	500 K	Temperature of hot plate
