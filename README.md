@@ -20,7 +20,7 @@ Activate the conda environment.
 conda activate thermo_comsol
 ```
 
-Install the required package. `os` is in-built in python, so no need to install it.
+Install the required packages. `os` is in-built in Python, so no need to install it.
 
 ```shell
 pip install numpy matplotlib pathlib
