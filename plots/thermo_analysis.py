@@ -596,17 +596,6 @@ if __name__ == "__main__":
         chf.plot_temp_diff_vs_thps()
         chf.plot_temp_diff_vs_thps_with_current()
 
-    # chf = CHF_Experiment()
-    # # print(chf.seebeck_data)
-    # # print(chf.tdep_power_data)
-    # # chf.plot_seebeck_coefficient()
-    # # chf.plot_V_vs_I_with_hot_plate_temperature()
-    # # chf.plot_power_vs_I_with_hot_plate_temperature()
-    # # chf.plot_max_power_vs_hot_plate_temperature()
-    # # chf.plot_max_power_and_seebeck_coefficient_vs_thps()
-    # # chf.plot_temp_diff_vs_thps()
-    # chf.plot_temp_diff_vs_thps_with_current()
-
     # Compare the geometry
     cg = Compare_Geometry()
     cg.plot_max_power_vs_thps()
