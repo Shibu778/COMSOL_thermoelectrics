@@ -20,7 +20,13 @@ class CHF_Experiment:
     # A class to perform the Power and Seebeck coefficient analysis of the thermoelectric data
     # when the heat flux at the bottom plate is constant
     # CHF: Constant Heat Flux
-    def __init__(self, data_path="../data/power/", system="S", save_path="./S"):
+    def __init__(
+        self,
+        data_path="../data/power/",
+        system="S",
+        save_path="./S",
+        save_plotdata=True,
+    ):
         self.path_vhp = os.path.join(data_path, system + "_VHP_vs_THP_vs_I0.txt")
         self.path_tcp = os.path.join(data_path, system + "_TCP_vs_THP_vs_I0.txt")
         self.heat_flux = 5  # W/(m^2K)
@@ -30,6 +36,7 @@ class CHF_Experiment:
         self.seebeck_data = self.seebeck_simulation(self.tcp_data, self.tdep_power_data)
         self.save_path = save_path
         self.system = system
+        self.save_plotdata = save_plotdata
 
     def plot_temp_diff_vs_thps_with_current(self):
         # Plots temperature difference vs Hot Plate Temperature with current
@@ -68,6 +75,21 @@ class CHF_Experiment:
 
         # print(data)
         # print(tcps)
+        if self.save_plotdata:
+            filename = os.path.join(
+                self.save_path, "Temp_Diff_vs_Hot_Plate_Temperature_with_Current.csv"
+            )
+            with open(filename, "w") as file:
+                file.write("THP,")
+                for key in tcps:
+                    file.write(f"delT_at_I0={key}A,")
+                file.write("\n")
+                for i in range(len(thps)):
+                    file.write(f"{thps[i]},")
+                    for key in tcps:
+                        file.write(f"{thps[i]-tcps[key][i]},")
+                    file.write("\n")
+
         return tcps
 
     def plot_temp_diff_vs_thps(self):
@@ -88,6 +110,15 @@ class CHF_Experiment:
             self.save_path, "Temp_Diff_vs_Hot_Plate_Temperature.png"
         )
         plt.savefig(filename, dpi=300)
+
+        if self.save_plotdata:
+            filename = os.path.join(
+                self.save_path, "Temp_Diff_vs_Hot_Plate_Temperature.csv"
+            )
+            with open(filename, "w") as file:
+                file.write("THP,delT\n")
+                for i in range(len(thps)):
+                    file.write(f"{thps[i]},{temp_diff[i]}\n")
 
     def plot_max_power_and_seebeck_coefficient_vs_thps(self):
         # Plot max power and Seebeck Coefficient with Hot Plate Temperature
@@ -125,6 +156,17 @@ class CHF_Experiment:
         )
         plt.savefig(filename, dpi=300)
 
+        if self.save_plotdata:
+            filename = os.path.join(
+                self.save_path, "Max_Power_and_Seebeck_Coefficient_vs_THP.csv"
+            )
+            with open(filename, "w") as file:
+                file.write("THP,Max_Power,Seebeck_Coefficient\n")
+                for i in range(len(thps)):
+                    file.write(
+                        f"{thps[i]},{tdep_power_data['electrical_properties'][i]['max_power']},{seebeck_data['seebeck_coefficient'][i]}\n"
+                    )
+
     def plot_max_power_vs_hot_plate_temperature(self):
         # Plot the maximum power vs hot plate temperature
         tdep_power_data = self.tdep_power_data
@@ -145,6 +187,15 @@ class CHF_Experiment:
             self.save_path, "Max_Power_vs_Hot_Plate_Temperature.png"
         )
         plt.savefig(filename, dpi=300)
+
+        if self.save_plotdata:
+            filename = os.path.join(
+                self.save_path, "Max_Power_vs_Hot_Plate_Temperature.csv"
+            )
+            with open(filename, "w") as file:
+                file.write("THP,Max_Power\n")
+                for i in range(len(thps)):
+                    file.write(f"{thps[i]},{max_powers[i]}\n")
 
     def plot_power_vs_I_with_hot_plate_temperature(self):
         # Plot the Power vs Current with hot plate temperature
@@ -184,6 +235,24 @@ class CHF_Experiment:
         fig.tight_layout()
         filename = os.path.join(self.save_path, "P_vs_I_with_Hot_Plate_Temperature.png")
         plt.savefig(filename, dpi=300)
+
+        if self.save_plotdata:
+            filename = os.path.join(
+                self.save_path, "P_vs_I_with_Hot_Plate_Temperature.csv"
+            )
+            with open(filename, "w") as file:
+                file.write("THP,I,P\n")
+                for i, thp in enumerate(thps):
+                    fit = tdep_power_data["electrical_properties"][i]["fit"]
+                    max_power = tdep_power_data["electrical_properties"][i]["max_power"]
+                    i_at_max_power = tdep_power_data["electrical_properties"][i][
+                        "I_at_max_power"
+                    ]
+                    I_range = np.linspace(0, i_max + 0.05, 100)
+                    V = np.polyval(fit, I_range)
+                    P = -I_range * V * 1e06
+                    for j in range(len(I_range)):
+                        file.write(f"{thp},{I_range[j]},{P[j]}\n")
 
     def plot_V_vs_I_with_hot_plate_temperature(self):
         # Plot the Voltage vs Current with hot plate temperature
@@ -227,6 +296,18 @@ class CHF_Experiment:
         filename = os.path.join(self.save_path, "V_vs_I_with_Hot_Plate_Temperature.png")
         plt.savefig(filename, dpi=300)
 
+        if self.save_plotdata:
+            filename = os.path.join(
+                self.save_path, "V_vs_I_with_Hot_Plate_Temperature.csv"
+            )
+            with open(filename, "w") as file:
+                file.write("THP,I,V\n")
+                for i, thp in enumerate(thps):
+                    I = np.array(tdep_power_data["data_VI"][i]["I"])
+                    V = np.array(tdep_power_data["data_VI"][i]["V"]) * 1e03
+                    for j in range(len(I)):
+                        file.write(f"{thp},{I[j]},{V[j]}\n")
+
     def plot_seebeck_coefficient(self):
         # Plot the Seebeck coefficient vs Hot Plate Temperature
         seebeck_data = self.seebeck_data
@@ -248,6 +329,17 @@ class CHF_Experiment:
             self.save_path, "Seebeck_Coefficient_vs_Hot_Plate_Temperature.png"
         )
         plt.savefig(filename, dpi=300)
+
+        if self.save_plotdata:
+            filename = os.path.join(
+                self.save_path, "Seebeck_Coefficient_vs_Hot_Plate_Temperature.csv"
+            )
+            with open(filename, "w") as file:
+                file.write("THP,Seebeck_Coefficient\n")
+                for i in range(len(seebeck_data["THP"])):
+                    file.write(
+                        f"{seebeck_data['THP'][i]},{seebeck_data['seebeck_coefficient'][i]}\n"
+                    )
 
     def read_vhp_vs_thp_vs_i0(self):
         # Read the VHP vs THP vs I0 data
@@ -426,11 +518,13 @@ class Compare_Geometry:
         data_path="../data/power/",
         systems=["S", "HC", "HH", "HM"],
         save_path="./compare/",
+        save_plotdata=True,
     ):
         self.data_path = data_path
         self.systems = systems
         self.save_path = save_path
         self.chf_data = {}
+        self.save_plotdata = save_plotdata
         for system in systems:
             self.chf_data[system] = CHF_Experiment(
                 data_path=data_path, system=system, save_path=f"./{system}"
@@ -493,6 +587,41 @@ class Compare_Geometry:
         )
         plt.savefig(filename, dpi=300)
 
+        if self.save_plotdata:
+            filename = os.path.join(
+                self.save_path, "Max_Power_and_Seebeck_Coefficient_vs_THP.csv"
+            )
+            with open(filename, "w") as file:
+                file.write(
+                    "THP,Max_Power_S,Max_Power_HC,Max_Power_HH,Max_Power_HM,Seebeck_Coefficient_S,Seebeck_Coefficient_HC,Seebeck_Coefficient_HH,Seebeck_Coefficient_HM\n"
+                )
+                for i in range(len(thps)):
+                    file.write(
+                        f"{thps[i]},"
+                        + ",".join(
+                            [
+                                str(
+                                    self.chf_data[system].tdep_power_data[
+                                        "electrical_properties"
+                                    ][i]["max_power"]
+                                )
+                                for system in self.systems
+                            ]
+                        )
+                        + ","
+                        + ",".join(
+                            [
+                                str(
+                                    self.chf_data[system].seebeck_data[
+                                        "seebeck_coefficient"
+                                    ][i]
+                                )
+                                for system in self.systems
+                            ]
+                        )
+                        + "\n"
+                    )
+
     def plot_temp_diff_vs_thps(self):
         # Plots temperature difference vs Hot Plate Temperature
         fig, ax = plt.subplots(figsize=(5, 4))
@@ -518,6 +647,27 @@ class Compare_Geometry:
             self.save_path, "Temp_Diff_vs_Hot_Plate_Temperature.png"
         )
         plt.savefig(filename, dpi=300)
+
+        if self.save_plotdata:
+            filename = os.path.join(
+                self.save_path, "Temp_Diff_vs_Hot_Plate_Temperature.csv"
+            )
+            with open(filename, "w") as file:
+                file.write("THP,delT_S,delT_HC,delT_HH,delT_HM\n")
+                for i in range(len(thps)):
+                    file.write(
+                        f"{thps[i]},"
+                        + ",".join(
+                            [
+                                str(
+                                    self.chf_data[system].tdep_power_data["THP"][i]
+                                    - self.chf_data[system].seebeck_data["TCP_I0=0"][i]
+                                )
+                                for system in self.systems
+                            ]
+                        )
+                        + "\n"
+                    )
 
     def plot_seebeck_coefficient(self):
         # Plot the Seebeck coefficient vs Hot Plate Temperature
@@ -548,6 +698,30 @@ class Compare_Geometry:
         )
         plt.savefig(filename, dpi=300)
 
+        if self.save_plotdata:
+            filename = os.path.join(
+                self.save_path, "Seebeck_Coefficient_vs_Hot_Plate_Temperature.csv"
+            )
+            with open(filename, "w") as file:
+                file.write(
+                    "THP,Seebeck_Coefficient_S,Seebeck_Coefficient_HC,Seebeck_Coefficient_HH,Seebeck_Coefficient_HM\n"
+                )
+                for i in range(len(seebeck_data["THP"])):
+                    file.write(
+                        f"{seebeck_data['THP'][i]},"
+                        + ",".join(
+                            [
+                                str(
+                                    self.chf_data[system].seebeck_data[
+                                        "seebeck_coefficient"
+                                    ][i]
+                                )
+                                for system in self.systems
+                            ]
+                        )
+                        + "\n"
+                    )
+
     def plot_max_power_vs_thps(self):
         # Plot the maximum power vs hot plate temperature
         fig, ax = plt.subplots(figsize=(5, 4))
@@ -575,6 +749,28 @@ class Compare_Geometry:
             self.save_path, "Max_Power_vs_Hot_Plate_Temperature.png"
         )
         plt.savefig(filename, dpi=300)
+
+        if self.save_plotdata:
+            filename = os.path.join(
+                self.save_path, "Max_Power_vs_Hot_Plate_Temperature.csv"
+            )
+            with open(filename, "w") as file:
+                file.write("THP,Max_Power_S,Max_Power_HC,Max_Power_HH,Max_Power_HM\n")
+                for i in range(len(thps)):
+                    file.write(
+                        f"{thps[i]},"
+                        + ",".join(
+                            [
+                                str(
+                                    self.chf_data[system].tdep_power_data[
+                                        "electrical_properties"
+                                    ][i]["max_power"]
+                                )
+                                for system in self.systems
+                            ]
+                        )
+                        + "\n"
+                    )
 
 
 # Main function
