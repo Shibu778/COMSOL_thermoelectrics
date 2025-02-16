@@ -1,6 +1,6 @@
-# 3D printed half Heusler high entropy alloy for thermoelectric application
+# Additive manufacturing of Topologically engineered double half-Heusler high-entropy alloy with enhanced thermoelectric properties
 
-This repository contains data and code related to COMSOL simulation in the paper "3D printed half Heusler high entropy alloy for thermoelectric application".
+This repository contains data and code related to COMSOL simulation in the paper "Additive manufacturing of Topologically engineered double half-Heusler high-entropy alloy with enhanced thermoelectric properties".
 
 To use the code and data, first clone this repository as follows.
 
