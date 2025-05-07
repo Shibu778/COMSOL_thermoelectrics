@@ -1,0 +1,13 @@
+% Model:              thermo_rect_phys.mph
+% Version:            COMSOL 6.0.0.405
+% Date:               Apr 9 2025, 12:19
+% Dimension:          1
+% Nodes:              5
+% Expressions:        1
+% Description:        Point graph
+% I0 (A)                  Temperature
+0                         293.1847784731795
+0.5                       293.1848133254175
+1                         293.1848605285843
+1.5                       293.1849203524997
+2                         293.1849920124587
